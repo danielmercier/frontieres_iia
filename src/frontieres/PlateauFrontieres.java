@@ -189,6 +189,7 @@ public class PlateauFrontieres implements Partie1 {
 		try {
 			coup = new CoupFrontieres(move);
 		} catch (Exception e) {
+			System.out.println(coup);
 			System.err.println("Syntax Error for variable move");
 			System.exit(1);
 		}

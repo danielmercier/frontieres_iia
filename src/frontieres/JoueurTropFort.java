@@ -38,7 +38,10 @@ public class JoueurTropFort implements IJoueur {
 
 	@Override
 	public String choixMouvement() {
-		return algo.meilleurCoup(plateau).toString();
+		String coup = algo.meilleurCoup(plateau).toString();
+		
+		plateau.play(coup, me);
+		return coup;
 	}
 
 	@Override

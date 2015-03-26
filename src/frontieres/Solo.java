@@ -48,7 +48,7 @@ public class Solo {
     private static IJoueur getDefaultPlayer(String s) {
 	System.out.println(s + " : defaultPlayer");
 	// vous devez faire qq chose comme return new MonMeilleurJoueur();
-	return new JoueurAleatoire();
+	return new JoueurTropFort();
 
     }
 
@@ -100,15 +100,17 @@ public class Solo {
 	    long waitingTime2 = new Date().getTime();
 	    // On rajoute 1 pour eliminer les temps infinis
 	    long waitingTime = waitingTime2 - waitingTime1 + 1;
-	    System.out.println("Le joueur " + joueurCourant.binoName() + " a jou� le coup " + coup + " en "
+	    System.out.println("Le joueur " + joueurCourant.binoName() + " a joué le coup " + coup + " en "
 		    + waitingTime + "s.");
 	    try {
 		Thread.sleep(1); // Juste pour attendre un peu
 	    } catch (InterruptedException e) {
 	    }
 
-	    if (coup.compareTo("xxxxx") == 0)
-		partieFinie = true;
+	    if (coup.compareTo("xxxxx") == 0){
+	    	//System.out.println("Bonjour");
+	    	partieFinie = true;
+	    }
 	    else {
 		if (joueurCourant.getNumJoueur() == BLANC)
 		    joueurCourant = joueurNoir;

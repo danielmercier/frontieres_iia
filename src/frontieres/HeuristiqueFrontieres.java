@@ -1,3 +1,5 @@
+package frontieres;
+
 public class HeuristiqueFrontieres {
 	
 	public static final int MODE1 = 0;
