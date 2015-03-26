@@ -28,7 +28,7 @@ public class JoueurTropFort implements IJoueur {
 		}
 		
 		//Spécifier l'algo ici
-		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej), 5);
+		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej), 2000);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class JoueurTropFort implements IJoueur {
 
 	@Override
 	public void mouvementEnnemi(String coup) {
-		plateau.play(ennemi, coup);
+		plateau.play(coup, ennemi);
 	}
 
 	@Override

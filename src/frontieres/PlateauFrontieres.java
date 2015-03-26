@@ -189,8 +189,7 @@ public class PlateauFrontieres implements Partie1 {
 		try {
 			coup = new CoupFrontieres(move);
 		} catch (Exception e) {
-			System.out.println(coup);
-			System.err.println("Syntax Error for variable move");
+			System.err.println("Syntax Error for variable move on estValide : " + move);
 			System.exit(1);
 		}
 		return coupValide(j, coup);
@@ -227,7 +226,7 @@ public class PlateauFrontieres implements Partie1 {
 			coup = new CoupFrontieres(move);
 			System.out.println(coup);
 		} catch (Exception e) {
-			System.err.println("Syntax Error for variable move");
+			System.err.println("Syntax Error for variable move on play : " + move);
 			System.exit(1);
 		}
 		joue(j, coup);
