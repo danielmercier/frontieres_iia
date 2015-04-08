@@ -28,7 +28,10 @@ public class JoueurTropFort implements IJoueur {
 		}
 		
 		//Spécifier l'algo ici
-		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej), 2000);
+		if(/*mycolour == IJoueur.BLANC*/true)
+			algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
+		else
+			algo = new AlphaBeta(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej), 4);
 	}
 
 	@Override
@@ -38,9 +41,14 @@ public class JoueurTropFort implements IJoueur {
 
 	@Override
 	public String choixMouvement() {
-		String coup = algo.meilleurCoup(plateau).toString();
+		if(plateau.finDePartie()){
+			return "xxxxx";
+		}
+		
+		String coup = algo.meilleurCoup(1000, plateau).toString();
 		
 		plateau.play(coup, me);
+		
 		return coup;
 	}
 

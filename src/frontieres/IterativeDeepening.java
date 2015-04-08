@@ -9,6 +9,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import javax.management.RuntimeErrorException;
+
 public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 
 	private class Couple<T1 extends Comparable<T1>, T2> implements Comparable<Couple<T1, T2>>{

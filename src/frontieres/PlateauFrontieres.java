@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class PlateauFrontieres implements Partie1 {
 	public static final int NB_WIN = 3;
@@ -520,7 +522,7 @@ public class PlateauFrontieres implements Partie1 {
 	}
 
 	public static void main(String args[]){
-		Joueur j1 = new Joueur("blanc");
+		/*Joueur j1 = new Joueur("blanc");
 		Joueur j2 = new Joueur("noir");
 	
 		PlateauFrontieres p = new PlateauFrontieres(j1,j2,j1);
@@ -529,6 +531,7 @@ public class PlateauFrontieres implements Partie1 {
 		System.out.println(p);
 		p.play("D1-E2", "noir");
 		System.out.println(p);
-		p.saveToFile("sauvegarde");
+		p.saveToFile("sauvegarde");*/
+		
 	}
 }

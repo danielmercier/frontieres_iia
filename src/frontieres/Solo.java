@@ -48,7 +48,8 @@ public class Solo {
     private static IJoueur getDefaultPlayer(String s) {
 	System.out.println(s + " : defaultPlayer");
 	// vous devez faire qq chose comme return new MonMeilleurJoueur();
-	return new JoueurTropFort();
+	
+		return new JoueurTropFort();
 
     }
 
@@ -124,7 +125,8 @@ public class Solo {
 	    }
 	}
 
-	System.out.println("Partie finie en " + nbCoups + " coups.\n");	
+	System.out.println("Gagnant : " + ((joueurCourant.getNumJoueur() != BLANC) ? "Blanc" : "Noir"));
+	System.out.println("Partie finie en " + nbCoups + " coups.\n");
     }
 
     /**

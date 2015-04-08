@@ -1,11 +1,12 @@
 package frontieres;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class BinaryTree<E extends Comparable> implements Collection<E> {
-
+public class BinaryTree<E extends Comparable<E>> implements Collection<E> {
+	
 	private class Tree<E>{
 		public E val;
 		public Tree<E> g;
@@ -17,6 +18,7 @@ public class BinaryTree<E extends Comparable> implements Collection<E> {
 	
 	private Tree<E> tree;
 	private int size;
+	
 	public BinaryTree(){
 		tree = null;
 		size = 0;
@@ -25,7 +27,7 @@ public class BinaryTree<E extends Comparable> implements Collection<E> {
 	@Override
 	public boolean add(E arg) {
 		if(tree == null){
-			tree = new Tree(arg);
+			tree = new Tree<E>(arg);
 			size++;
 			return true;
 		}
@@ -98,7 +100,7 @@ public class BinaryTree<E extends Comparable> implements Collection<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-		LinkedList<E> l = new LinkedList<E>();
+		ArrayList<E> l = new ArrayList<E>();
 		
 		iterate(l, tree);
 		
@@ -114,7 +116,7 @@ public class BinaryTree<E extends Comparable> implements Collection<E> {
 	public boolean removeAll(Collection<?> arg0) {
 		return false;
 	}
-
+ 
 	@Override
 	public boolean retainAll(Collection<?> arg0) {
 		return false;
@@ -136,11 +138,71 @@ public class BinaryTree<E extends Comparable> implements Collection<E> {
 		return null;
 	}
 
-	private void iterate(LinkedList<E> l, Tree<E> tree){
+	@Override
+	public String toString(){
+		ArrayList<E> l = new ArrayList<E>();
+		
+		iterate(l, tree);
+		
+		return l.toString();
+	}
+
+	public ArrayList<E> getList(){
+		ArrayList<E> l = new ArrayList<E>();
+		
+		iterate(l, tree);
+		
+		return l;
+	}
+	
+	public E min(){
+		if(tree != null){
+			return min(tree);
+		}
+		
+		return null;
+	}
+	
+	private E min(Tree<E> t){
+		if(t.g == null){
+			return t.val;
+		}
+		else{
+			return min(t.g);
+		}
+	}
+	
+	public E max(){
+		if(tree != null){
+			return max(tree);
+		}
+		
+		return null;
+	}
+	
+	private E max(Tree<E> t){
+		if(t.d == null){
+			return t.val;
+		}
+		else{
+			return max(t.d);
+		}
+	}
+	
+	private void iterate(ArrayList<E> l, Tree<E> tree){
 		if(tree != null){
 			iterate(l, tree.g);
 			l.add(tree.val);
 			iterate(l, tree.d);
 		}
+	}
+	
+	public static void main(String args[]){
+		BinaryTree<Float> abr = new BinaryTree<Float>();
+		abr.add(12.2f);
+		abr.add(12.123413f);
+		abr.add(12.13123f);
+		
+		System.out.println(abr.min());
 	}
 }
