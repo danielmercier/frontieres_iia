@@ -90,8 +90,12 @@ public class PlateauFrontieres implements Partie1 {
 		return plateau[i][j] == VIDE;
 	}
 
-	private boolean isEnemy(int i, int j) {
+	public boolean isEnemy(int i, int j) {
 		return current.equals(joueur1) ? plateau[i][j] == PION_J2 : plateau[i][j] == PION_J1;
+	}
+	
+	public boolean isFreeOrEnemy(int i, int j){
+		return current.equals(joueur1) ? plateau[i][j] != PION_J1 : plateau[i][j] != PION_J2;
 	}
 
 	public ArrayList<CoupFrontieres> coupsPossibles() {
@@ -275,7 +279,7 @@ public class PlateauFrontieres implements Partie1 {
 		}
 		
 		for(Position pos : pieceJ2){
-			newPlateau.pieceJ1.add(pos);
+			newPlateau.pieceJ2.add(pos);
 		}
 		
 		return newPlateau;
@@ -364,6 +368,9 @@ public class PlateauFrontieres implements Partie1 {
 			return;
 		}
 
+		pieceJ1.clear();
+		pieceJ2.clear();
+		
 		String line = null;
 
 		try {
@@ -408,6 +415,12 @@ public class PlateauFrontieres implements Partie1 {
 						System.exit(1);
 					}
 					plateau[cpt_line][i-2] = (cline[i] == '-') ? VIDE : (cline[i] == 'b') ? PION_J1 : PION_J2;
+					if(cline[i] == 'b'){
+						pieceJ1.add(new Position(cpt_line, i-2));
+					}
+					else if(cline[i] == 'n'){
+						pieceJ2.add(new Position(cpt_line, i-2));
+					}
 				}
 				cpt_line++;
 			}
@@ -525,7 +538,7 @@ public class PlateauFrontieres implements Partie1 {
 	}
 	
 	public ArrayList<Position> getPieces(Joueur who){
-		if(who == joueur1){
+		if(who.equals(joueur1)){
 			return getPiecesJ1();
 		}
 		else{

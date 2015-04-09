@@ -72,11 +72,27 @@ public class HeuristiqueFrontieres {
 		}
 	}*/
 	
+	/*public int liberteJ1(PlateauFrontieres board){
+		for(Position posJ1 : board.getPiecesJ1()){
+			for(Position posJ2 : board.getPiecesJ2()){
+				if(posJ1.row <= posJ2.)
+				if(posJ2.col == posJ1.col){
+					
+				}
+				//else(posJ2.col < posJ2.)
+			}
+		}
+		
+		return 3;
+	}
+	
+	public int liberteJ2(){
+		return 3;
+	}*/
+	
 	//simulation pour trouver la liberte d'une piece
-	public int liberte(PlateauFrontieres board, Position pos, int prof){
+	public int liberte(PlateauFrontieres board, Position pos, int alpha, int beta, int prof){
 		//3 coups possible max
-		int val = Integer.MIN_VALUE;
-		int newVal;
 		int nbBouge = 0;
 		PlateauFrontieres newBoard;
 		
@@ -84,16 +100,17 @@ public class HeuristiqueFrontieres {
 			//On peu aller en face
 			Position newPos = new Position(pos.row - 1, pos.col);
 			
-			if(board.isFree(newPos.row, newPos.col)){
+			if(board.isFreeOrEnemy(newPos.row, newPos.col)){
 				CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
 				newBoard = board.copy();
 				nbBouge++;
 				
 				newBoard.joue(coup);
 				
-				newVal = ennemy(newBoard, newPos, prof + 1);
-				if(newVal > val){
-					newVal = val;
+				alpha = Math.max(alpha, ennemy(newBoard, newPos, alpha, beta, prof + 1));
+				
+				if(alpha >= beta){
+					return beta;
 				}
 			}
 			
@@ -101,16 +118,17 @@ public class HeuristiqueFrontieres {
 				//On peut aller en diag droite
 				newPos = new Position(pos.row - 1, pos.col + 1);
 				
-				if(board.isFree(newPos.row, newPos.col)){
+				if(board.isFreeOrEnemy(newPos.row, newPos.col)){
 					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
 					newBoard = board.copy();
 					nbBouge++;
 					
 					newBoard.joue(coup);
 					
-					newVal = ennemy(newBoard, newPos, prof + 1);
-					if(newVal > val){
-						newVal = val;
+					alpha = Math.max(alpha, ennemy(newBoard, newPos, alpha, beta, prof + 1));
+					
+					if(alpha >= beta){
+						return beta;
 					}
 				}
 			}
@@ -119,16 +137,17 @@ public class HeuristiqueFrontieres {
 				//On peut aller en diag gauche
 				newPos = new Position(pos.row - 1, pos.col - 1);
 				
-				if(board.isFree(newPos.row, newPos.col)){
+				if(board.isFreeOrEnemy(newPos.row, newPos.col)){
 					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
 					newBoard = board.copy();
 					nbBouge++;
 					
 					newBoard.joue(coup);
 					
-					newVal = ennemy(newBoard, newPos, prof + 1);
-					if(newVal > val){
-						newVal = val;
+					alpha = Math.max(alpha, ennemy(newBoard, newPos, alpha, beta, prof + 1));
+					
+					if(alpha >= beta){
+						return beta;
 					}
 				}
 			}
@@ -137,7 +156,7 @@ public class HeuristiqueFrontieres {
 				return 0;
 			}
 			else{
-				return val;
+				return alpha;
 			}
 		}
 		else{
@@ -145,19 +164,17 @@ public class HeuristiqueFrontieres {
 		}
 	}
 	
-	public int ennemy(PlateauFrontieres board, Position pos, int prof){
+	public int ennemy(PlateauFrontieres board, Position pos, int alpha, int beta, int prof){
 
 		LinkedList<CoupFrontieres> ajouer = new LinkedList<CoupFrontieres>();
 		
-		
-		int val = Integer.MAX_VALUE;
-		
-		for(Position enpos : board.getPieces(board.getOther(joueur))){
-			if(enpos.row >= pos.row/* || Math.abs(enpos.row - pos.row)  Math.abs(enpos.col - pos.row)*/){
+		for(Position enpos : board.getPiecesJ2()){
+			if(enpos.row >= pos.row){
 				//Pas la peine de regarder ce coup, il ne permetra pas de manger la piece
 				continue;
 			}
 			if(enpos.row < (PlateauFrontieres.NB_LIGNES - 1)){
+				
 				//On peu avancer
 				Position posAv = new Position(enpos.row + 1, enpos.col);
 				Position posAvDD = null;
@@ -171,61 +188,123 @@ public class HeuristiqueFrontieres {
 					posAvDG = new Position(enpos.row + 1, enpos.col - 1);
 				}
 				
-				//On l'a mangé
-				if(posAv.equals(pos)){
-					return 0;
+				
+				if(board.isFreeOrEnemy(posAv.row, posAv.col) && enpos.col == pos.col){
+					//Test si on mange la piece
+					if(posAv.equals(pos)){
+						return 0;
+					}
+					
+					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAv.row, posAv.col);
+					ajouer.add(coup);
+					
+					//Pas besoin de regarder la suite
+					continue;
 				}
-				else{
-					if(enpos.col == pos.col || (!board.isFree(posAv.row, posAv.col) && (posAvDD != null || posAvDG != null)){
-						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), newPos.row, newPos.col);
+				else if(!board.isFreeOrEnemy(posAv.row, posAv.col) && enpos.col == pos.col){
+					if(posAvDD != null && board.isFreeOrEnemy(posAvDD.row, posAvDD.col)){
+						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDD.row, posAvDD.col);
 						ajouer.add(coup);
 					}
+					else if(posAvDG != null && board.isFreeOrEnemy(posAvDG.row, posAvDG.col)){
+						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDG.row, posAvDG.col);
+						ajouer.add(coup);
+					}
+					
+					//Pas besoin de regarder la suite
+					continue;
 				}
 				
-				if(enpos.col < (PlateauFrontieres.NB_COLONNES - 1)){
+				if(posAvDD != null){
 					//On peut aller en diag droite
-					newPos = new Position(enpos.row + 1, enpos.col + 1);
 					
-					//On l'a mangé
-					if(newPos.equals(pos)){
-						return 0;
+					if(board.isFreeOrEnemy(posAvDD.row, posAvDD.col) && enpos.col < pos.col){
+						//Test si on mange la piece
+						if(posAvDD.equals(pos)){
+							return 0;
+						}
+						
+						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDD.row, posAvDD.col);
+						ajouer.add(coup);
+						
+						//Pas besoin de regarder la suite
+						continue;
 					}
-					else{
-						if(enpos.col < pos.col){
-							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), newPos.row, newPos.col);
+					else if(!board.isFreeOrEnemy(posAvDD.row, posAvDD.col) && enpos.col < pos.col){
+						
+						if(board.isFreeOrEnemy(posAv.row, posAv.col)){
+							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAv.row, posAv.col);
 							ajouer.add(coup);
 						}
+						else if(posAvDG != null && board.isFreeOrEnemy(posAvDG.row, posAvDG.col)){
+							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDG.row, posAvDG.col);
+							ajouer.add(coup);
+						}
+						
+						//Pas besoin de regarder la suite
+						continue;
 					}
 				}
 				
-				if(enpos.col > 0){
-					//On peut aller en diag gauche
-					newPos = new Position(enpos.row + 1, enpos.col - 1);
+				if(posAvDG != null){
+					//On peut aller en diag droite
 					
-					//On l'a mangé
-					if(newPos.equals(pos)){
-						return 0;
+					if(board.isFreeOrEnemy(posAvDG.row, posAvDG.col) && enpos.col > pos.col){
+						//Test si on mange la piece
+						if(posAvDG.equals(pos)){
+							return 0;
+						}
+						
+						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDG.row, posAvDG.col);
+						ajouer.add(coup);
+						
+						//Pas besoin de regarder la suite
+						continue;
 					}
-					else{
-						if(enpos.col > pos.col){
-							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), newPos.row, newPos.col);
+					else if(!board.isFreeOrEnemy(posAvDG.row, posAvDG.col) && enpos.col > pos.col){
+						if(board.isFreeOrEnemy(posAv.row, posAv.col)){
+							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAv.row, posAv.col);
 							ajouer.add(coup);
 						}
+						else if(posAvDD != null && board.isFreeOrEnemy(posAvDD.row, posAvDD.col)){
+							CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), posAvDD.row, posAvDD.col);
+							ajouer.add(coup);
+						}
+						
+						//Pas besoin de regarder la suite
+						continue;
 					}
 				}
 			}
 		}
+		
+		boolean empty = true;
+		
 		
 		for(CoupFrontieres coup : ajouer){
+			empty = false;
 			PlateauFrontieres newBoard = board.copy();
 			newBoard.joue(coup);
-			int newVal = liberte(newBoard, pos, prof);
-			if(newVal < val){
-				val = newVal;
+			
+			beta = Math.min(beta, liberte(newBoard, pos, alpha, beta, prof));
+			
+			if(alpha >= beta){
+				return alpha;
 			}
 		}
 		
-		return val + 1;
+		if(empty){
+			PlateauFrontieres newBoard = board.copy();
+			newBoard.joue(board.coupsPossibles().get(0));
+			
+			beta = liberte(newBoard, pos, alpha, beta, prof);
+			
+			if(alpha >= beta){
+				return alpha;
+			}
+		}
+		
+		return beta + 1;
 	}
 	
 	public float eval(PlateauFrontieres board) {
@@ -248,21 +327,21 @@ public class HeuristiqueFrontieres {
 			float diffAvancee = board.getAvanceeX(joueur, expAvancee) - board.getAvanceeX(board.getOther(joueur), expAvancee);
 			h = coefPrises * diffPrises + diffAvancee;
 			
-			/*if(board.isJoueurBlanc(joueur)){
+			if(board.isJoueurBlanc(joueur)){
 				long tStart = System.currentTimeMillis();
 	
 				for(Position p : board.getPieces(joueur)){
-					liberte(board, p, 0);
+					//liberte(board, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0);
 				}
 				
 				long tEnd = System.currentTimeMillis();
 				long tDelta = tEnd - tStart;
 				double elapsedSeconds = tDelta / 1000.0;
 				
-				if(elapsedSeconds >= 0.1){
+				/*if(elapsedSeconds >= 0.1){
 					System.out.println("TOO LONG ! " + elapsedSeconds);
-				}
-			}*/
+				}*/
+			}
 			
 			if(board.getXwins(joueur))
 				h = MAX_HEUR;
@@ -283,9 +362,18 @@ public class HeuristiqueFrontieres {
 		PlateauFrontieres b = new PlateauFrontieres(j1, j2, j1);
 		HeuristiqueFrontieres h = new HeuristiqueFrontieres(MODE2, j1);
 		
-		/*for(Position p : b.getPieces(j1)){
-			System.out.println(h.liberte(b, p, 0));
-		}*/
-		System.out.println(h.liberte(b, new Position(7, 0), 0));
+		//b.setFromFile("plateauTest");
+		
+		long tStart = System.currentTimeMillis();
+		
+		for(Position p : b.getPiecesJ1()){
+			System.out.println(h.liberte(b, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0));
+		}
+		
+		long tEnd = System.currentTimeMillis();
+		long tDelta = tEnd - tStart;
+		double elapsedSeconds = tDelta / 1000.0;
+		
+		System.out.println(elapsedSeconds);
 	}
 }
