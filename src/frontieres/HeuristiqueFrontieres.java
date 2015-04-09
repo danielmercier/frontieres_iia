@@ -97,7 +97,7 @@ public class HeuristiqueFrontieres {
 				}
 			}
 			
-			if(pos.col < (board.NB_COLONNES - 1)){
+			if(pos.col < (PlateauFrontieres.NB_COLONNES - 1)){
 				//On peut aller en diag droite
 				newPos = new Position(pos.row - 1, pos.col + 1);
 				
@@ -121,15 +121,6 @@ public class HeuristiqueFrontieres {
 				
 				if(board.isFree(newPos.row, newPos.col)){
 					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
-					newBoard = board.copy();
-					nbBouge++;
-					
-					newBoard.joue(coup);
-					
-					newVal = ennemy(newBoard, newPos, prof + 1);
-					if(newVal > val){
-						newVal = val;
-					}CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
 					newBoard = board.copy();
 					nbBouge++;
 					
@@ -162,26 +153,36 @@ public class HeuristiqueFrontieres {
 		int val = Integer.MAX_VALUE;
 		
 		for(Position enpos : board.getPieces(board.getOther(joueur))){
-			if(enpos.row >= pos.row){
+			if(enpos.row >= pos.row/* || Math.abs(enpos.row - pos.row)  Math.abs(enpos.col - pos.row)*/){
 				//Pas la peine de regarder ce coup, il ne permetra pas de manger la piece
 				continue;
 			}
-			if(enpos.row < (board.NB_LIGNES - 1)){
+			if(enpos.row < (PlateauFrontieres.NB_LIGNES - 1)){
 				//On peu avancer
-				Position newPos = new Position(enpos.row + 1, enpos.col);
+				Position posAv = new Position(enpos.row + 1, enpos.col);
+				Position posAvDD = null;
+				Position posAvDG = null;
+				
+				if(enpos.col < (PlateauFrontieres.NB_COLONNES - 1)){
+					posAvDD = new Position(enpos.row + 1, enpos.col + 1);
+				}
+				
+				if(enpos.col > 0){
+					posAvDG = new Position(enpos.row + 1, enpos.col - 1);
+				}
 				
 				//On l'a mangé
-				if(newPos.equals(pos)){
+				if(posAv.equals(pos)){
 					return 0;
 				}
 				else{
-					if(enpos.col == pos.col){
+					if(enpos.col == pos.col || (!board.isFree(posAv.row, posAv.col) && (posAvDD != null || posAvDG != null)){
 						CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(enpos.row, enpos.col), newPos.row, newPos.col);
 						ajouer.add(coup);
 					}
 				}
 				
-				if(enpos.col < (board.NB_COLONNES - 1)){
+				if(enpos.col < (PlateauFrontieres.NB_COLONNES - 1)){
 					//On peut aller en diag droite
 					newPos = new Position(enpos.row + 1, enpos.col + 1);
 					
@@ -247,7 +248,7 @@ public class HeuristiqueFrontieres {
 			float diffAvancee = board.getAvanceeX(joueur, expAvancee) - board.getAvanceeX(board.getOther(joueur), expAvancee);
 			h = coefPrises * diffPrises + diffAvancee;
 			
-			if(board.isJoueurBlanc(joueur)){
+			/*if(board.isJoueurBlanc(joueur)){
 				long tStart = System.currentTimeMillis();
 	
 				for(Position p : board.getPieces(joueur)){
@@ -261,7 +262,7 @@ public class HeuristiqueFrontieres {
 				if(elapsedSeconds >= 0.1){
 					System.out.println("TOO LONG ! " + elapsedSeconds);
 				}
-			}
+			}*/
 			
 			if(board.getXwins(joueur))
 				h = MAX_HEUR;
@@ -285,6 +286,6 @@ public class HeuristiqueFrontieres {
 		/*for(Position p : b.getPieces(j1)){
 			System.out.println(h.liberte(b, p, 0));
 		}*/
-		h.liberte(b, new Position(7, 0), 0);
+		System.out.println(h.liberte(b, new Position(7, 0), 0));
 	}
 }

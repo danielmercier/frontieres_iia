@@ -9,8 +9,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-import javax.management.RuntimeErrorException;
-
 public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 
 	private class Couple<T1 extends Comparable<T1>, T2> implements Comparable<Couple<T1, T2>>{
@@ -147,7 +145,11 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 				newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, 1, false);
 				Couple<Float, CoupFrontieres> coupHeur = new Couple<Float, CoupFrontieres>(newAlpha, coup);
 
-				if(!discard) { // coup exploré entièrement : màj de son heuristique
+				if(coupeRacine){
+					tree.add(new Couple<Float, CoupFrontieres>(HeuristiqueFrontieres.MIN_HEUR, coup));
+					newCoupsHeur.put(coup, HeuristiqueFrontieres.MIN_HEUR);
+				}
+				else if(!discard) { // coup exploré entièrement : màj de son heuristique
 					tree.add(coupHeur);
 					newCoupsHeur.put(coup, newAlpha);
 				}
@@ -162,6 +164,8 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 						gagn = true;
 					}
 				}
+				
+				System.out.println("Coup : " + coup.toString() + "H : " + newAlpha);
 
 				if(elapsed >= timeLimit) {
 					timeout = true;
@@ -179,6 +183,10 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		if(!discard){
 			//Dans ce cas, on remet a jour l'ancien mapping des heuristiques avec le nouveau
 			coupsHeur = newCoupsHeur;
+		}
+		
+		for(Couple<Float, CoupFrontieres> cpl : tree){
+			System.out.println("Coup : " + cpl.b + " H : " + cpl.a);
 		}
 		
 		return tree.min();
@@ -235,10 +243,13 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 						alpha = newAlpha;
 					}
 
-					tree.add(new Couple<Float, CoupFrontieres>(alpha, coup));
+					tree.add(new Couple<Float, CoupFrontieres>(newAlpha, coup));
 
 					if(alpha >= beta) { // coupe
 						timeout = true;
+						if(depth == 1){
+							coupeRacine = true;
+						}
 					}
 					else if(elapsed >= timeLimit) {
 						if(i < cp.size()) // coup pas exploré entièrement
