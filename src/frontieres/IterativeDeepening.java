@@ -82,6 +82,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 
 		while(elapsed < timeLimit) {
 			retour = search(board);
+			System.out.println("\tBest move : " + retour.b);
 			if(retour.a == HeuristiqueFrontieres.MAX_HEUR || retour.a == HeuristiqueFrontieres.MIN_HEUR || retour.a == HeuristiqueFrontieres.TIE_HEUR)
 				return retour.b; // issue de la partie fixée : on arrête l'itération, coup renvoyé directement
 			++ profMax;
@@ -165,7 +166,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 					}
 				}
 				
-				System.out.println("Coup : " + coup.toString() + "H : " + newAlpha);
+				// System.out.println("Coup : " + coup.toString() + "H : " + newAlpha);
 
 				if(elapsed >= timeLimit) {
 					timeout = true;
@@ -185,9 +186,11 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 			coupsHeur = newCoupsHeur;
 		}
 		
+		/*
 		for(Couple<Float, CoupFrontieres> cpl : tree){
 			System.out.println("Coup : " + cpl.b + " H : " + cpl.a);
 		}
+		*/
 		
 		return tree.min();
 	}
@@ -279,3 +282,4 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		return heuristique;
 	}
 }
+

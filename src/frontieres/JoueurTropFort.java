@@ -10,10 +10,11 @@ import javax.imageio.ImageIO;
 
 public class JoueurTropFort implements IJoueur {
 
-	private static final int TOTAL_TIME = 30000; // temps total accordé
+	private static final int TOTAL_TIME = 120000; // temps total accordé
 	private static final int MIN_TIMELIMIT = 500; // minimum pour timelimit
 	
-	private static final int ESTIM_MAJ_NB_COUPS = 20; // estimation du nombre total de demi-coups
+	private static final int ESTIM_MAJ_NB_COUPS = 40; // estimation du nombre total de demi-coups
+		// 40 semble être un bon majorant, on dépasse très rarement 35.
 	
 	private static final String TIME_BMP = "time.bmp";
 	private static final String EXP_AVANCEE_BMP = "avancee.bmp";
