@@ -75,7 +75,13 @@ public class CoupFrontieres {
 		}
 	}
 	
-	public boolean equals(CoupFrontieres c2) {
-		return toString().equals(c2.toString());
+	@Override
+	public boolean equals(Object o) {
+		if(o == this) return true;
+		if(!(o instanceof CoupFrontieres)) return false;
+		
+		CoupFrontieres c = (CoupFrontieres) o;
+		
+		return toString().equals(c.toString());
 	}
 }

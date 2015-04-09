@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class PlateauFrontieres implements Partie1 {
 	public static final int NB_WIN = 3;

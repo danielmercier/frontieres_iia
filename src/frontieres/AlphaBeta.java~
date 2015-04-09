@@ -41,6 +41,7 @@ public class AlphaBeta implements AlgoFrontieres {
 					return meilleur;
 			}
 		}
+<<<<<<< HEAD
 		heuristiqueMeilleurCoup = alpha;
 		return meilleur;
 	}

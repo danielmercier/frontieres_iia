@@ -8,7 +8,7 @@ public class HeuristiqueFrontieres {
 	
 	public static final float MIN_HEUR = -Float.MAX_VALUE;
 	public static final float MAX_HEUR = Float.MAX_VALUE;
-	public static float TIE_HEUR = -100; 	// évolutif
+	public static final float TIE_HEUR = 0.001f;
 	
 	private int mode;
 	private Joueur joueur;

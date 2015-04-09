@@ -81,7 +81,7 @@ public class JoueurTropFort implements IJoueur {
 		}
 
 		//Spécifier l'algo ici
-		algo = new Iter_old(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
+		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
 	}
 
 	@Override
@@ -91,6 +91,10 @@ public class JoueurTropFort implements IJoueur {
 
 	@Override
 	public String choixMouvement() {
+
+		if(plateau.finDePartie()){
+			return "xxxxx";
+		}
 		
 		long startTime = System.nanoTime();
 		
@@ -126,7 +130,6 @@ public class JoueurTropFort implements IJoueur {
 
 		plateau.play(coup, me);
 		nbCoups += 1;
-		
 		remaining -= (System.nanoTime() - startTime) / 1000000;
 		return coup;
 	}
