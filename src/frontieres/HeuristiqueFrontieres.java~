@@ -8,28 +8,10 @@ public class HeuristiqueFrontieres {
 	
 	public static final float MIN_HEUR = -Float.MAX_VALUE;
 	public static final float MAX_HEUR = Float.MAX_VALUE;
-	public static float TIE_HEUR = -100; 	// évolutif
+	public static final float TIE_HEUR = -Float.MAX_VALUE+1;
 	
 	private int mode;
 	private Joueur joueur;
-	private float expAvancee;
-	private float coefPrises;
-	private float coefBloqueurs;
-	
-	public void setExpAvancee(float ea) {
-		// TODO : recalculer TIE_HEUR
-		expAvancee = ea;
-	}
-	
-	public void setCoefPrises(float cp) {
-		// TODO : recalculer TIE_HEUR
-		coefPrises = cp;
-	}
-	
-	public void setCoefBloqueurs(float cb) {
-		// TODO : recalculer TIE_HEUR
-		coefPrises = cb;
-	}
 	
 	public HeuristiqueFrontieres(int mode, Joueur joueur) {
 		this.mode = mode;
@@ -49,8 +31,8 @@ public class HeuristiqueFrontieres {
 				h = TIE_HEUR;
 		}
 		else if(mode == MODE2) {
-			expAvancee = 1.2f;
-			coefPrises = 1000;
+			float expAvancee = 1.2f;
+			float coefPrises = 1000;
 			float diffPrises = board.getNbPrisesX(joueur) - board.getNbPrisesX(board.getOther(joueur));
 			float diffAvancee = board.getAvanceeX(joueur, expAvancee) - board.getAvanceeX(board.getOther(joueur), expAvancee);
 			h = coefPrises * diffPrises + diffAvancee;
