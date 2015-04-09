@@ -82,7 +82,7 @@ public class JoueurTropFort implements IJoueur {
 		}
 
 		//Spécifier l'algo ici
-		algo = new Iter_old(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
+		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
 	}
 
 	@Override
