@@ -31,7 +31,6 @@ public class AlphaBeta implements AlgoFrontieres {
 			newBoard = board.copy();
 			newBoard.joue(newBoard.getCurrent(), coup);
 			newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, 1, false);
-			System.out.println("H : " + newAlpha);
 			if(newAlpha > alpha) {
 				alpha = newAlpha;
 				meilleur = coup;

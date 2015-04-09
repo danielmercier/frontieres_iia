@@ -8,10 +8,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+
+
 public class PlateauFrontieres implements Partie1 {
+	
 	public static final int NB_WIN = 3;
 
 	public static final int NB_LIGNES = 8;
@@ -25,6 +29,8 @@ public class PlateauFrontieres implements Partie1 {
 	public static final int NB_PIONS_INIT_J2 = 8;
 
 	private char[][] plateau;
+	private ArrayList<Position> pieceJ1;
+	private ArrayList<Position> pieceJ2;
 
 	private Joueur joueur1, joueur2;
 	private Joueur current; // joueur dont c'est le tour
@@ -41,11 +47,15 @@ public class PlateauFrontieres implements Partie1 {
 		current = curr;
 		nbPrisesJ1 = nbPrisesJ2 = nbCoupsJ1 = nbCoupsJ2 = 0;
 		j1noMove = j2noMove = tie = j1wins = j2wins = false;
+		
 		reset();
 	}
 
 	private PlateauFrontieres() {
 		plateau = new char[NB_LIGNES][NB_COLONNES];
+		
+		pieceJ1 = new ArrayList<Position>();
+		pieceJ2 = new ArrayList<Position>();
 	}
 
 	private void swapJoueur() {
@@ -54,16 +64,22 @@ public class PlateauFrontieres implements Partie1 {
 	
 	public void reset() {
 		for(int j = 0; j < NB_COLONNES; j++) {
-			if(j < NB_PIONS_INIT_J1)
+			if(j < NB_PIONS_INIT_J1){
 				plateau[NB_LIGNES-1][j] = PION_J1;
-			else
+				pieceJ1.add(new Position(NB_LIGNES-1, j));
+			}
+			else{
 				plateau[NB_LIGNES-1][j] = VIDE;
+			}
 		}
 		for(int j = 0; j < NB_COLONNES; j++) {
-			if(j < NB_PIONS_INIT_J2)
+			if(j < NB_PIONS_INIT_J2){
 				plateau[0][j] = PION_J2;
-			else
+				pieceJ2.add(new Position(0, j));
+			}
+			else{
 				plateau[0][j] = VIDE;
+			}
 		}
 		for(int i = 1; i < NB_LIGNES-1; i++) {
 			for(int j = 0; j < NB_COLONNES; j++)
@@ -150,6 +166,7 @@ public class PlateauFrontieres implements Partie1 {
 					if(isEnemy(new_i, new_j))
 						++ nbPrisesJ1;
 					plateau[new_i][new_j] = PION_J1;
+					pieceJ1.add(new Position(new_i, new_j));
 				}
 				else {
 					j2noMove = false;
@@ -157,9 +174,11 @@ public class PlateauFrontieres implements Partie1 {
 					if(isEnemy(new_i, new_j))
 						++ nbPrisesJ2;
 					plateau[new_i][new_j] = PION_J2;
+					pieceJ2.add(new Position(new_i, new_j));
 				}
 				
 				plateau[c.getFrom().geti()][c.getFrom().getj()] = VIDE;
+				pieceJ1.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
 			}
 			else {
 				if(current.equals(joueur1))
@@ -262,6 +281,15 @@ public class PlateauFrontieres implements Partie1 {
 		newPlateau.nbPrisesJ2 = nbPrisesJ2;
 		newPlateau.j1noMove = j1noMove;
 		newPlateau.j2noMove = j2noMove;
+		
+		for(Position pos : pieceJ1){
+			newPlateau.pieceJ1.add(pos);
+		}
+		
+		for(Position pos : pieceJ2){
+			newPlateau.pieceJ1.add(pos);
+		}
+		
 		return newPlateau;
 	}
 
@@ -455,6 +483,14 @@ public class PlateauFrontieres implements Partie1 {
 		return current;
 	}
 	
+	public boolean isJoueurBlanc(Joueur who){
+		return joueur1 == who;
+	}
+	
+	public boolean isJoueurNoir(Joueur who){
+		return joueur2 == who;
+	}
+	
 	public Joueur getOther(Joueur j) {
 		return (j.equals(joueur1) ? joueur2 : joueur1);
 	}
@@ -485,6 +521,23 @@ public class PlateauFrontieres implements Partie1 {
 
 	public int getNbPrisesJ2() {
 		return nbPrisesJ2;
+	}
+	
+	public ArrayList<Position> getPiecesJ1(){
+		return pieceJ1;
+	}
+	
+	public ArrayList<Position> getPiecesJ2(){
+		return pieceJ2;
+	}
+	
+	public ArrayList<Position> getPieces(Joueur who){
+		if(who == joueur1){
+			return getPiecesJ1();
+		}
+		else{
+			return getPiecesJ2();
+		}
 	}
 	
 	////////////////////////////////////
