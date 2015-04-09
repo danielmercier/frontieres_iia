@@ -14,6 +14,24 @@ public class HeuristiqueFrontieres {
 	
 	private int mode;
 	private Joueur joueur;
+	private float expAvancee;
+	private float coefPrises;
+	private float coefBloqueurs;
+	
+	public void setExpAvancee(float ea) {
+		// TODO : recalculer TIE_HEUR
+		expAvancee = ea;
+	}
+	
+	public void setCoefPrises(float cp) {
+		// TODO : recalculer TIE_HEUR
+		coefPrises = cp;
+	}
+	
+	public void setCoefBloqueurs(float cb) {
+		// TODO : recalculer TIE_HEUR
+		coefPrises = cb;
+	}
 	
 	public HeuristiqueFrontieres(int mode, Joueur joueur) {
 		this.mode = mode;
@@ -58,18 +76,22 @@ public class HeuristiqueFrontieres {
 	public int liberte(PlateauFrontieres board, Position pos, int prof){
 		//3 coups possible max
 		int val = Integer.MIN_VALUE;
+		int newVal;
+		int nbBouge = 0;
+		PlateauFrontieres newBoard;
 		
 		if(pos.row > 0){
 			//On peu aller en face
 			Position newPos = new Position(pos.row - 1, pos.col);
 			
-			CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
-			PlateauFrontieres newBoard = board.copy();
-			
-			if(newBoard.coupValide(joueur, coup)){
-				newBoard.joue(joueur, coup);
+			if(board.isFree(newPos.row, newPos.col)){
+				CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
+				newBoard = board.copy();
+				nbBouge++;
 				
-				int newVal = ennemy(newBoard, newPos, prof + 1);
+				newBoard.joue(coup);
+				
+				newVal = ennemy(newBoard, newPos, prof + 1);
 				if(newVal > val){
 					newVal = val;
 				}
@@ -79,13 +101,17 @@ public class HeuristiqueFrontieres {
 				//On peut aller en diag droite
 				newPos = new Position(pos.row - 1, pos.col + 1);
 				
-				coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
-				newBoard = board.copy();
-				if(!newBoard.joue(joueur, coup)) System.out.println("ERROR");
-				
-				newVal = ennemy(newBoard, newPos, prof + 1);
-				if(newVal > val){
-					newVal = val;
+				if(board.isFree(newPos.row, newPos.col)){
+					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
+					newBoard = board.copy();
+					nbBouge++;
+					
+					newBoard.joue(coup);
+					
+					newVal = ennemy(newBoard, newPos, prof + 1);
+					if(newVal > val){
+						newVal = val;
+					}
 				}
 			}
 			
@@ -93,17 +119,35 @@ public class HeuristiqueFrontieres {
 				//On peut aller en diag gauche
 				newPos = new Position(pos.row - 1, pos.col - 1);
 				
-				coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
-				newBoard = board.copy();
-				if(!newBoard.joue(joueur, coup)) System.out.println("ERROR");
-				
-				newVal = ennemy(newBoard, newPos, prof + 1);
-				if(newVal > val){
-					newVal = val;
+				if(board.isFree(newPos.row, newPos.col)){
+					CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
+					newBoard = board.copy();
+					nbBouge++;
+					
+					newBoard.joue(coup);
+					
+					newVal = ennemy(newBoard, newPos, prof + 1);
+					if(newVal > val){
+						newVal = val;
+					}CoupFrontieres coup = new CoupFrontieres(new CoupFrontieres(pos.row, pos.col), newPos.row, newPos.col);
+					newBoard = board.copy();
+					nbBouge++;
+					
+					newBoard.joue(coup);
+					
+					newVal = ennemy(newBoard, newPos, prof + 1);
+					if(newVal > val){
+						newVal = val;
+					}
 				}
 			}
 			
-			return val;
+			if(nbBouge == 0){
+				return 0;
+			}
+			else{
+				return val;
+			}
 		}
 		else{
 			return 0;
@@ -173,7 +217,7 @@ public class HeuristiqueFrontieres {
 		
 		for(CoupFrontieres coup : ajouer){
 			PlateauFrontieres newBoard = board.copy();
-			newBoard.joue(joueur, coup);
+			newBoard.joue(coup);
 			int newVal = liberte(newBoard, pos, prof);
 			if(newVal < val){
 				val = newVal;
@@ -196,9 +240,9 @@ public class HeuristiqueFrontieres {
 				h = TIE_HEUR;
 		}
 		else if(mode == MODE2) {
+			expAvancee = 1.2f;
+			coefPrises = 1000;
 			
-			float expAvancee = 1.2f;
-			float coefPrises = 1000;
 			float diffPrises = board.getNbPrisesX(joueur) - board.getNbPrisesX(board.getOther(joueur));
 			float diffAvancee = board.getAvanceeX(joueur, expAvancee) - board.getAvanceeX(board.getOther(joueur), expAvancee);
 			h = coefPrises * diffPrises + diffAvancee;

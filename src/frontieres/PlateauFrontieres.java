@@ -36,7 +36,6 @@ public class PlateauFrontieres implements Partie1 {
 	private Joueur current; // joueur dont c'est le tour
 
 	private int nbPrisesJ1, nbPrisesJ2;
-	private int nbCoupsJ1, nbCoupsJ2;
 
 	private boolean j1noMove, j2noMove, j1wins, j2wins, tie;
 
@@ -45,7 +44,7 @@ public class PlateauFrontieres implements Partie1 {
 		joueur1 = j1;
 		joueur2 = j2;
 		current = curr;
-		nbPrisesJ1 = nbPrisesJ2 = nbCoupsJ1 = nbCoupsJ2 = 0;
+		nbPrisesJ1 = nbPrisesJ2 = 0;
 		j1noMove = j2noMove = tie = j1wins = j2wins = false;
 		
 		reset();
@@ -61,7 +60,7 @@ public class PlateauFrontieres implements Partie1 {
 	private void swapJoueur() {
 		current = current.equals(joueur1) ? joueur2 : joueur1;
 	}
-	
+
 	public void reset() {
 		for(int j = 0; j < NB_COLONNES; j++) {
 			if(j < NB_PIONS_INIT_J1){
@@ -87,7 +86,7 @@ public class PlateauFrontieres implements Partie1 {
 		}
 	}
 
-	private boolean isFree(int i, int j) {
+	public boolean isFree(int i, int j) {
 		return plateau[i][j] == VIDE;
 	}
 
@@ -141,7 +140,6 @@ public class PlateauFrontieres implements Partie1 {
 	}
 
 	public boolean coupValide(Joueur who, CoupFrontieres c) {
-		// "who" = vérif en mode interactif
 		if(c.isNoMove()) {
 			return who.equals(current) && coupsPossibles().get(0).isNoMove();
 		}
@@ -154,55 +152,48 @@ public class PlateauFrontieres implements Partie1 {
 		}
 	}
 	
-	public boolean joue(Joueur who, CoupFrontieres c) {
-		// "who" = vérif en mode interactif
-		if(coupValide(who, c)) {
-			if(!c.isNoMove()) {
-				int new_i = c.geti();
-				int new_j = c.getj();
-				if(current.equals(joueur1)) {
-					j1noMove = false;
-					++ nbCoupsJ1;
-					if(isEnemy(new_i, new_j))
-						++ nbPrisesJ1;
-					plateau[new_i][new_j] = PION_J1;
-					pieceJ1.add(new Position(new_i, new_j));
-				}
-				else {
-					j2noMove = false;
-					++ nbCoupsJ2;
-					if(isEnemy(new_i, new_j))
-						++ nbPrisesJ2;
-					plateau[new_i][new_j] = PION_J2;
-					pieceJ2.add(new Position(new_i, new_j));
-				}
-				
-				plateau[c.getFrom().geti()][c.getFrom().getj()] = VIDE;
+	public void joue(CoupFrontieres c) {
+		if(!c.isNoMove()) {
+			int new_i = c.geti();
+			int new_j = c.getj();
+			if(current.equals(joueur1)) {
+				j1noMove = false;
+				if(isEnemy(new_i, new_j))
+					++ nbPrisesJ1;
+				plateau[new_i][new_j] = PION_J1;
+				pieceJ1.add(new Position(new_i, new_j));
 				pieceJ1.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
 			}
 			else {
-				if(current.equals(joueur1))
-					j1noMove = true;
-				else
-					j2noMove = true;
+				j2noMove = false;
+				if(isEnemy(new_i, new_j))
+					++ nbPrisesJ2;
+				plateau[new_i][new_j] = PION_J2;
+				pieceJ2.add(new Position(new_i, new_j));
+				pieceJ2.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
 			}
-			// on regarde si fin de partie (gain ou nul)
-			// si il y a gain, ce n'est pas forcément en faveur de current.
-			// ex : j1 est coincé avec 2 pions en frontière, et j2 n'a plus qu'un pion qu'il envoie à la frontière
-			// j2 joue son dernier coup, et c'est j1 qui gagne
-			int nbFrontJ1 = nbFrontPawns(joueur1);
-			int nbFrontJ2 = nbFrontPawns(joueur2);
-			j1wins = (nbFrontPawns(joueur1) == NB_WIN) || (j1noMove && j2noMove && nbFrontJ1 > nbFrontJ2);
-			j2wins = (nbFrontPawns(joueur2) == NB_WIN) || (j1noMove && j2noMove && nbFrontJ2 > nbFrontJ1);
-			tie = j1noMove && j2noMove && nbFrontJ1 == nbFrontJ2;
-			swapJoueur();
-			return true;
+				
+			plateau[c.getFrom().geti()][c.getFrom().getj()] = VIDE;
+			
 		}
 		else {
-			return false;
+			if(current.equals(joueur1))
+				j1noMove = true;
+			else
+				j2noMove = true;
 		}
+		// on regarde si fin de partie (gain ou nul)
+		// si il y a gain, ce n'est pas forcément en faveur de current.
+		// ex : j1 est coincé avec 2 pions en frontière, et j2 n'a plus qu'un pion qu'il envoie à la frontière
+		// j2 joue son dernier coup, et c'est j1 qui gagne
+		int nbFrontJ1 = nbFrontPawns(joueur1);
+		int nbFrontJ2 = nbFrontPawns(joueur2);
+		j1wins = (nbFrontJ1 == NB_WIN) || (j1noMove && j2noMove && nbFrontJ1 > nbFrontJ2);
+		j2wins = (nbFrontJ2 == NB_WIN) || (j1noMove && j2noMove && nbFrontJ2 > nbFrontJ1);
+		tie = j1noMove && j2noMove && nbFrontJ1 < NB_WIN && nbFrontJ1 == nbFrontJ2;
+		swapJoueur();
 	}
-	
+
 	@Override
 	public boolean estValide(String move, String player) {
 		Joueur j = (player == "blanc") ? joueur1 : joueur2;
@@ -219,14 +210,14 @@ public class PlateauFrontieres implements Partie1 {
 	@Override
 	public String[] mouvementsPossibles(String player) {
 		Joueur save = current;
-		
+
 		if(player.equals("blanc")){
 			current = joueur1;
 		}
 		else{
 			current = joueur2;
 		}
-		
+
 		ArrayList<CoupFrontieres> cp = this.coupsPossibles();
 		String mv[] = new String[cp.size()];
 		int i = 0;
@@ -235,13 +226,12 @@ public class PlateauFrontieres implements Partie1 {
 			i++;
 		}
 		current = save;
-		
+
 		return mv;
 	}
 
 	@Override
 	public void play(String move, String player) {
-		Joueur j = (player == "blanc") ? joueur1 : joueur2;
 		CoupFrontieres coup = null;
 		try {
 			coup = new CoupFrontieres(move);
@@ -250,7 +240,7 @@ public class PlateauFrontieres implements Partie1 {
 			System.err.println("Syntax Error for variable move on play : " + move);
 			System.exit(1);
 		}
-		joue(j, coup);
+		joue(coup);
 	}
 
 	public int nbFrontPawns(Joueur who) {
@@ -275,8 +265,6 @@ public class PlateauFrontieres implements Partie1 {
 		newPlateau.joueur1 = joueur1;
 		newPlateau.joueur2 = joueur2;		
 		newPlateau.current = current;
-		newPlateau.nbCoupsJ1 = nbCoupsJ1;
-		newPlateau.nbCoupsJ2 = nbCoupsJ2;
 		newPlateau.nbPrisesJ1 = nbPrisesJ1;
 		newPlateau.nbPrisesJ2 = nbPrisesJ2;
 		newPlateau.j1noMove = j1noMove;
@@ -304,7 +292,7 @@ public class PlateauFrontieres implements Partie1 {
 		s+="% ABCDEFGH\n";
 		return s;
 	}
-	
+
 	public float getAvanceeX(Joueur who, float exp) {
 		int i = 0, j = 0, k = 0, nbPions;
 		char symb;
@@ -333,16 +321,21 @@ public class PlateauFrontieres implements Partie1 {
 		}
 		return avancee;
 	}
-	
+
+	public int estimationNbCoupsRestants(Joueur who) {
+		// TODO
+		return 0;
+	}
+
 	@Override
 	public boolean finDePartie() {
 		return j1wins || j2wins || tie;
 	}
-	
+
 	public String getHashKey() {
 		// optimisation possible : profiter d'une autre méthode pour faire ce calcul ?
 		String hKey = current.toString(); // header = id du joueur courant
-			// (nécessaire pour gérer le cas limite des deux joueurs bloqués)
+		// (nécessaire pour gérer le cas limite des deux joueurs bloqués)
 		int i = 0, j = 0, k = 0;
 		int nbPions = NB_PIONS_INIT_J1-nbPrisesJ2 + NB_PIONS_INIT_J2-nbPrisesJ1;
 		boolean done = false;
@@ -360,7 +353,7 @@ public class PlateauFrontieres implements Partie1 {
 		}
 		return hKey;
 	}
-	
+
 	@Override
 	public void setFromFile(String fileName) {
 		BufferedReader b;
@@ -370,9 +363,9 @@ public class PlateauFrontieres implements Partie1 {
 			System.err.println("File was not found");
 			return;
 		}
-		
+
 		String line = null;
-		
+
 		try {
 			line = b.readLine();
 		} catch (IOException e) {
@@ -383,9 +376,9 @@ public class PlateauFrontieres implements Partie1 {
 			}
 			System.exit(1);
 		}
-		
+
 		int cpt_line = 0;
-		
+
 		while(line != null){
 			if(!(line.toCharArray()[0] == '%')){
 				if(cpt_line >= 8){
@@ -418,14 +411,14 @@ public class PlateauFrontieres implements Partie1 {
 				}
 				cpt_line++;
 			}
-			
+
 			try {
 				line = b.readLine();
 			} catch (IOException e) {
 				System.err.println("IO error : " + e.getMessage());
 			}
 		}
-		
+
 		if(cpt_line < 8){
 			System.err.println("Syntax error, too few lines not commented");
 			try {
@@ -434,11 +427,11 @@ public class PlateauFrontieres implements Partie1 {
 			}
 			System.exit(1);
 		}
-		
+
 		joueur1 = new Joueur("blanc");
 		joueur2 = new Joueur("noir");
 		current = joueur1;
-		
+
 		try {
 			b.close();
 		} catch (IOException e2) {
@@ -454,14 +447,14 @@ public class PlateauFrontieres implements Partie1 {
 			System.err.println("IO error : " + e1.getMessage());
 			System.exit(1);
 		}
-		
+
 		try {
 			b.write(this.toString());
 		} catch (IOException e1) {
 			System.err.println("IO error : " + e1.getMessage());
 			System.exit(1);
 		}
-		
+
 		try {
 			b.close();
 		} catch (IOException e) {
@@ -469,7 +462,7 @@ public class PlateauFrontieres implements Partie1 {
 			System.exit(1);
 		}
 	}
-	
+
 	///////////////
 	/* GETTERS : */
 	///////////////
@@ -478,7 +471,7 @@ public class PlateauFrontieres implements Partie1 {
 	public char[][] getCharArray() {
 		return plateau;
 	}
-	
+
 	public Joueur getCurrent() {
 		return current;
 	}
@@ -490,15 +483,15 @@ public class PlateauFrontieres implements Partie1 {
 	public boolean isJoueurNoir(Joueur who){
 		return joueur2 == who;
 	}
-	
+
 	public Joueur getOther(Joueur j) {
 		return (j.equals(joueur1) ? joueur2 : joueur1);
 	}
-	
+
 	public boolean getXwins(Joueur j) {
 		return (j.equals(joueur1) ? getJ1wins() : getJ2wins());
 	}
-	
+
 	public int getNbPrisesX(Joueur j) {
 		return (j.equals(joueur1) ? getNbPrisesJ1() : getNbPrisesJ2());
 	}

@@ -31,7 +31,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		public boolean equals(Object o){
 			if(this == o) return true;
 			if(!(o instanceof Couple)) return false;
-			
+
 			@SuppressWarnings("unchecked")
 			Couple<T1, T2> c = (Couple<T1, T2>) o;
 			if(this.a.compareTo(c.a) == 0) return true;
@@ -51,10 +51,6 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 	private Timer timer;
 	private boolean coupeRacine, discard;
 	private long timePassedGetting;
-	
-	// TODO :
-	// simplification màj meilleur coup (utiliser dernier et avant-dernier retours seulement)
-	// structure d'arbre avec couples (coup, heuristique) dans la table
 
 	public IterativeDeepening(HeuristiqueFrontieres heuristique) {
 		this.heuristique = heuristique;
@@ -85,73 +81,72 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		startTime = System.nanoTime();
 		elapsed = 0;
 		timeLimit = nbMilliCoup;
-		
+
 		while(elapsed < timeLimit) {
 			retour = search(board);
 			if(retour.a == HeuristiqueFrontieres.MAX_HEUR || retour.a == HeuristiqueFrontieres.MIN_HEUR || retour.a == HeuristiqueFrontieres.TIE_HEUR)
 				return retour.b; // issue de la partie fixée : on arrête l'itération, coup renvoyé directement
 			++ profMax;
 		}
-		 showStat();
-		// System.out.println("Liste finale des coups :");
-		// System.out.println(couplesCoupsHeur);
-		// System.out.println("Best move : " + meilleur);
+		
+		showStat();
+		
 		if(discard) profMax--;
+		
 		System.out.println("Total time : " + elapsed);
-		 System.out.println(profMax);
-		 System.out.println("Time passed getting in hashtable : " + timePassedGetting / 1000000.0);
-		 
-		 orderedMoves.remove(board.getHashKey());
-		 
+		System.out.println("ProfMax : " + profMax);
+		System.out.println("Time passed getting in hashtable : " + timePassedGetting / 1000000.0);
+
+		orderedMoves.remove(board.getHashKey());
+
 		return retour.b;
 	}
 
 	private Couple<Float, CoupFrontieres> search(PlateauFrontieres board) {
-		// System.out.println("----- Iteration for depth " + profMax + " : ");
+		System.out.println("----- Iteration for depth " + profMax + " : ");
 		String hKey = board.getHashKey();
-		
+
 		long time = System.nanoTime();
 		
 		BinaryTree<Couple<Float, CoupFrontieres>> tree = orderedMoves.get(hKey);
 		timePassedGetting += System.nanoTime() - time;
-		
+
 		ArrayList<CoupFrontieres> cp = null;
-		
+
 		if(tree == null) { // si pas encore de clé pour ce plateau
 			List<CoupFrontieres> all = board.coupsPossibles();
 			Collections.shuffle(all);
 			cp = (ArrayList<CoupFrontieres>) all;
 			tree = new BinaryTree<Couple<Float, CoupFrontieres>>();
-			
+
 			time = System.nanoTime();
 			orderedMoves.put(hKey, tree);
 			timePassedGetting += System.nanoTime() - time;
 		}
-		else{
+		else {
 			cp = new ArrayList<CoupFrontieres>();
 			for(Couple<Float, CoupFrontieres> cpl : tree){
 				cp.add(cpl.b);
 			}
 			tree.clear();
 		}
-		
+
 		float alpha = HeuristiqueFrontieres.MIN_HEUR;
 		float beta = HeuristiqueFrontieres.MAX_HEUR;
 		float newAlpha;
 		boolean gagn = false;
 		boolean timeout = false;
 		Hashtable<CoupFrontieres, Float> newCoupsHeur = new Hashtable<CoupFrontieres, Float>();
-		
 		PlateauFrontieres newBoard;
-		
+
 		for(CoupFrontieres coup : cp) {
 			if(!gagn && !timeout){
 				newBoard = board.copy();
-				newBoard.joue(newBoard.getCurrent(), coup);
+				newBoard.joue(coup);
 				coupeRacine = discard = false;
 				newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, 1, false);
 				Couple<Float, CoupFrontieres> coupHeur = new Couple<Float, CoupFrontieres>(newAlpha, coup);
-				
+
 				if(!discard) { // coup exploré entièrement : màj de son heuristique
 					tree.add(coupHeur);
 					newCoupsHeur.put(coup, newAlpha);
@@ -160,14 +155,14 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 					//On ajoute le coup avec son heuristique de la profondeur précédente.
 					tree.add(new Couple<Float, CoupFrontieres>(coupsHeur.get(coup), coup));
 				}
-				
+
 				if(newAlpha > alpha) {
 					alpha = newAlpha;
 					if(alpha == HeuristiqueFrontieres.MAX_HEUR) { // strat gagnante
 						gagn = true;
 					}
 				}
-				
+
 				if(elapsed >= timeLimit) {
 					timeout = true;
 				}
@@ -200,13 +195,13 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		else {
 			++ nodes;
 			String hKey = board.getHashKey();
-			
+
 			long time = System.nanoTime();
 			BinaryTree<Couple<Float, CoupFrontieres>> tree = orderedMoves.get(hKey);
 			timePassedGetting += System.nanoTime() - time;
-			
+
 			ArrayList<CoupFrontieres> cp;
-			
+
 			if(tree == null) { // si pas encore de clé pour ce plateau
 				List<CoupFrontieres> all = board.coupsPossibles();
 				Collections.shuffle(all);
@@ -223,7 +218,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 				}
 				tree.clear();
 			}
-			
+
 			PlateauFrontieres newBoard;
 			float newAlpha;
 			boolean timeout = false;
@@ -233,15 +228,15 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 				if(!timeout){
 					++ i;
 					newBoard = board.copy();
-					newBoard.joue(newBoard.getCurrent(), coup);
+					newBoard.joue(coup);
 					newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, depth+1, !even);
-					
+
 					if(newAlpha > alpha) {
 						alpha = newAlpha;
 					}
-					
+
 					tree.add(new Couple<Float, CoupFrontieres>(alpha, coup));
-					
+
 					if(alpha >= beta) { // coupe
 						timeout = true;
 					}
@@ -255,7 +250,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 					tree.add(new Couple<Float, CoupFrontieres>((float)HeuristiqueFrontieres.MIN_HEUR, coup));
 				}
 			}
-			
+
 			return alpha;
 		}
 	}
@@ -263,8 +258,13 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 	public String toString() {
 		return "Iterative Deepening (timeLimit = " + timeLimit + ")";
 	}
-	
+
 	public static void main(String []args){
-		
+
+	}
+
+	@Override
+	public HeuristiqueFrontieres getHeuristique() {
+		return heuristique;
 	}
 }

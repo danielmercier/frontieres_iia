@@ -8,17 +8,18 @@ public class AlphaBeta implements AlgoFrontieres {
 	private int profMax;
 	private HeuristiqueFrontieres heuristique;
 	private int leaves, nodes;
+	private float heuristiqueMeilleurCoup;
 	
-	public AlphaBeta(HeuristiqueFrontieres heuristique, int profMax) {
+	public AlphaBeta(HeuristiqueFrontieres heuristique) {
 		this.heuristique = heuristique;
-		this.profMax = profMax;
 	}
 	
 	public void showStat() {
 		System.out.println("leaves = " + leaves + ", nodes = " + nodes);
 	}
 
-	public CoupFrontieres meilleurCoup(int nbMilliCoup, PlateauFrontieres board) {
+	public CoupFrontieres meilleurCoup(int profMax, PlateauFrontieres board) {
+		this.profMax = profMax;
 		leaves = nodes = 0;
 		ArrayList<CoupFrontieres> cp = (ArrayList<CoupFrontieres>) board.coupsPossibles();
 		Collections.shuffle(cp);
@@ -29,16 +30,22 @@ public class AlphaBeta implements AlgoFrontieres {
 		float newAlpha;
 		for(CoupFrontieres coup : cp) {
 			newBoard = board.copy();
-			newBoard.joue(newBoard.getCurrent(), coup);
+			newBoard.joue(coup);
 			newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, 1, false);
 			if(newAlpha > alpha) {
 				alpha = newAlpha;
 				meilleur = coup;
+				heuristiqueMeilleurCoup = alpha;
 				if(alpha == HeuristiqueFrontieres.MAX_HEUR) // strat gagnante
 					return meilleur;
 			}
 		}
+		heuristiqueMeilleurCoup = alpha;
 		return meilleur;
+	}
+	
+	public float getHeuristiqueMeilleurCoup() {
+		return heuristiqueMeilleurCoup;
 	}
 	
 	public float negAlphaBeta(PlateauFrontieres board, float alpha, float beta, int depth, boolean even) {
@@ -56,7 +63,7 @@ public class AlphaBeta implements AlgoFrontieres {
 			float newAlpha;
 			for(CoupFrontieres coup : cp) {
 				newBoard = board.copy();
-				newBoard.joue(newBoard.getCurrent(), coup);
+				newBoard.joue(coup);
 				newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, depth+1, !even);
 				alpha = Math.max(alpha, newAlpha);
 				if(alpha >= beta)
@@ -68,5 +75,10 @@ public class AlphaBeta implements AlgoFrontieres {
 	
 	public String toString() {
 		return "AlphaBeta (maxDepth = " + profMax + ")";
+	}
+
+	@Override
+	public HeuristiqueFrontieres getHeuristique() {
+		return heuristique;
 	}
 }
