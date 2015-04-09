@@ -331,8 +331,9 @@ public class HeuristiqueFrontieres {
 				long tStart = System.currentTimeMillis();
 	
 				for(Position p : board.getPieces(joueur)){
-					//liberte(board, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0);
+					//System.out.println(liberte(board, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0));
 				}
+				System.out.println("\n");
 				
 				long tEnd = System.currentTimeMillis();
 				long tDelta = tEnd - tStart;
@@ -367,7 +368,7 @@ public class HeuristiqueFrontieres {
 		long tStart = System.currentTimeMillis();
 		
 		for(Position p : b.getPiecesJ1()){
-			System.out.println(h.liberte(b, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0));
+			h.liberte(b, p, -Integer.MAX_VALUE, Integer.MAX_VALUE, 0);
 		}
 		
 		long tEnd = System.currentTimeMillis();
