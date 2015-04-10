@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 //Joueur qui joue avec iterative deepening alphabeta et gestion du temps au cours de la partie
 public class JoueurTropFort implements IJoueur {
 
-	private static final int TOTAL_TIME = 120000; // temps total accordé
+	private static final int TOTAL_TIME = 580000; // temps total accordé
 	private static final int MIN_TIMELIMIT = 500; // minimum pour timelimit
 	
 	private static final int ESTIM_MAJ_NB_COUPS = 40; // estimation du nombre total de demi-coups
@@ -76,14 +76,12 @@ public class JoueurTropFort implements IJoueur {
 			mej = j1;
 			me = "blanc";
 			ennemi = "noir";
-			remaining = 10 * 60 * 1000;
 			//amplitudeCoefPrises = ;
 		}
 		else{
 			mej = j2;
 			me = "noir";
 			ennemi = "blanc";
-			remaining = 10 * 60 * 1000;
 			//amplitudeCoefPrises = ;
 		}
 
@@ -137,6 +135,7 @@ public class JoueurTropFort implements IJoueur {
 		plateau.play(coup, me);
 		nbCoups += 1;
 		remaining -= (System.nanoTime() - startTime) / 1000000;
+		
 		return coup;
 	}
 	
@@ -299,10 +298,14 @@ public class JoueurTropFort implements IJoueur {
 	public void declareLeVainqueur(int colour) {
 		if(colour == IJoueur.BLANC){
 			if(me == "blanc"){
-				System.out.println("J'AI GAGNÉ");
+				System.out.println("!!GAGNÉ!!");
+				System.out.println("  /\\_/\\");
+				System.out.println("=( °w° )=");
+				System.out.println("  )   (  //");
+				System.out.println(" (__ __)//");
 			}
 			else{
-				System.out.println("...");
+				System.out.println("NOOOOOOOO!!!!!!!");
 			}
 		}
 		else{
@@ -310,7 +313,7 @@ public class JoueurTropFort implements IJoueur {
 				System.out.println("J'AI GAGNÉ");
 			}
 			else{
-				System.out.println("...");
+				System.out.println("NOOOOOOOO!!!!!!!");
 			}
 		}
 	}
@@ -324,5 +327,4 @@ public class JoueurTropFort implements IJoueur {
 	public String binoName() {
 		return "Mercier_Morier";
 	}
-
 }

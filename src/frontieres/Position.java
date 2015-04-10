@@ -1,11 +1,20 @@
 package frontieres;
 
+//Classe permettant de stocker une position, soit, le numéro d'une colonne et d'une ligne.
 public class Position{
 	public int row;
 	public int col;
 	
 	public Position(int row, int col){
 		this.row = row;
+		this.col = col;
+	}
+	
+	public void setRow(int row){
+		this.row = row;
+	}
+	
+	public void setCol(int col){
 		this.col = col;
 	}
 	

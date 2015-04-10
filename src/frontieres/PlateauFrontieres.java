@@ -13,6 +13,35 @@ import java.util.ArrayList;
 
 public class PlateauFrontieres implements Partie1 {
 	
+	/* Fonction de test pour vérifier si les listes de pièces sont mise a jour corréctement et correspondent bien au plateau.
+	public boolean test(){
+		for(int i = 0 ; i < 8 ; i++){
+			for(int j = 0 ; j < 8 ; j++){
+				if(plateau[i][j] == PION_J1 && !pieceJ1.contains(new Position(i, j))){
+					return false;
+				}
+				else if(plateau[i][j] == PION_J2 && !pieceJ2.contains(new Position(i, j))){
+					return false;
+				}
+			}
+		}
+		
+		for(Position p : pieceJ1){
+			if(!(plateau[p.row][p.col] == PION_J1)){
+				return false;
+			}
+		}
+		
+		for(Position p : pieceJ2){
+			if(!(plateau[p.row][p.col] == PION_J2)){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	*/
+	
 	public static final int NB_WIN = 3;
 
 	public static final int NB_LIGNES = 8;
@@ -98,42 +127,24 @@ public class PlateauFrontieres implements Partie1 {
 	public ArrayList<CoupFrontieres> coupsPossibles() {
 		// (toujours pour le joueur "current")
 		ArrayList<CoupFrontieres> cp = new ArrayList<CoupFrontieres>();
-		int nbPions, iIncrement;
-		char symb;
-		if(current.equals(joueur1)) {
-			symb = PION_J1;
-			nbPions = NB_PIONS_INIT_J1-nbPrisesJ2;
-			iIncrement = -1; // aller vers le "haut" du plateau
-		}
-		else {
-			symb = PION_J2;
-			nbPions = NB_PIONS_INIT_J2-nbPrisesJ1;
-			iIncrement = 1; // aller vers le "bas" du plateau
-		}
-		int k = 0, i = 0, j = 0;
+		int iIncrement;
+		iIncrement = current.equals(joueur1) ? -1 : 1;
+		
 		CoupFrontieres from, left, straight, right;
-		boolean done = false;
-		while(!done && i < NB_LIGNES) {
-			j = 0;
-			while(!done && j < NB_COLONNES) {
-				if(plateau[i][j] == symb) {
-					++ k;
-					from = new CoupFrontieres(i, j);
-					left = new CoupFrontieres(from, i + iIncrement, j-1);
-					straight = new CoupFrontieres(from, i + iIncrement, j);
-					right = new CoupFrontieres(from, i + iIncrement, j+1);
-					if(coupValide(current, left))
-						cp.add(left);
-					if(coupValide(current, straight))
-						cp.add(straight);
-					if(coupValide(current, right))
-						cp.add(right);
-				}
-				++ j;
-				done = (k == nbPions);
-			}
-			++ i;
+		
+		for(Position p : this.getPieces(current)){
+			from = new CoupFrontieres(p.row, p.col);
+			left = new CoupFrontieres(from, p.row + iIncrement, p.col -1);
+			straight = new CoupFrontieres(from, p.row + iIncrement, p.col);
+			right = new CoupFrontieres(from, p.row + iIncrement, p.col+1);
+			if(coupValide(current, left))
+				cp.add(left);
+			if(coupValide(current, straight))
+				cp.add(straight);
+			if(coupValide(current, right))
+				cp.add(right);
 		}
+		
 		if(cp.size() == 0) { // si pas d'autre choix que passer son tour
 			cp.add(CoupFrontieres.NO_MOVE);
 		}
@@ -178,8 +189,9 @@ public class PlateauFrontieres implements Partie1 {
 				}
 				
 				plateau[new_i][new_j] = PION_J1;
-				pieceJ1.add(new Position(new_i, new_j));
+				
 				pieceJ1.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
+				pieceJ1.add(new Position(new_i, new_j));
 			}
 			else {
 				j2noMove = false;
@@ -188,8 +200,9 @@ public class PlateauFrontieres implements Partie1 {
 					pieceJ1.remove(new Position(new_i, new_j));
 				}
 				plateau[new_i][new_j] = PION_J2;
-				pieceJ2.add(new Position(new_i, new_j));
+				
 				pieceJ2.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
+				pieceJ2.add(new Position(new_i, new_j));
 			}
 				
 			plateau[c.getFrom().geti()][c.getFrom().getj()] = VIDE;
@@ -352,6 +365,7 @@ public class PlateauFrontieres implements Partie1 {
 			}
 			++ i;
 		}
+		
 		return hKey;
 	}
 

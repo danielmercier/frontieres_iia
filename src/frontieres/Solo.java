@@ -121,7 +121,7 @@ public class Solo {
 		// On averti le second joueur du coup calcule par le precedent
 		joueurCourant.mouvementEnnemi(coup);
 		// Ce sera ensuite a lui de jouer de retour en haut de la boucle
-
+		
 	    }
 	}
 
