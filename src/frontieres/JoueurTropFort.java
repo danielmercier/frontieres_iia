@@ -10,9 +10,11 @@ import javax.imageio.ImageIO;
 
 public class JoueurTropFort implements IJoueur {
 
-	private static final int TOTAL_TIME = 600000; // temps total accordé
+	private static final int TOTAL_TIME = 120000; // temps total accordé
+	private static final int MIN_TIMELIMIT = 500; // minimum pour timelimit
 	
-	private static final int AVG_NB_COUPS = 40; // estimation du nombre total de demi-coups
+	private static final int ESTIM_MAJ_NB_COUPS = 40; // estimation du nombre total de demi-coups
+		// 40 semble être un bon majorant, on dépasse très rarement 35.
 	
 	private static final String TIME_BMP = "time.bmp";
 	private static final String EXP_AVANCEE_BMP = "avancee.bmp";
@@ -22,7 +24,7 @@ public class JoueurTropFort implements IJoueur {
 	// bornes inf et sup des paramètres variables (hors temps de recherche)
 	// utilisés pour dé-normaliser les courbes bitmap
 	private static final float MIN_EXP_AVANCEE = 1.1f;
-	private static final float MAX_EXP_AVANCEE = 3f;
+	private static final float MAX_EXP_AVANCEE = 2f;
 	private static final float MIN_COEF_PRISES = 200f;
 	private static final float MAX_COEF_PRISES = 300f;
 	private static final float MIN_COEF_BLOQUEURS = 0f;
@@ -73,11 +75,13 @@ public class JoueurTropFort implements IJoueur {
 			mej = j1;
 			me = "blanc";
 			ennemi = "noir";
+			remaining = 2 * 60 * 1000;
 		}
 		else{
 			mej = j2;
 			me = "noir";
 			ennemi = "blanc";
+			remaining = 2 * 60 * 1000;
 		}
 
 		//Spécifier l'algo ici
@@ -118,7 +122,6 @@ public class JoueurTropFort implements IJoueur {
 			algo.getHeuristique().setCoefBloqueurs(coefBloqueurs);
 			
 			System.out.println("NB MOVES = " + nbCoups);
-			System.out.println("AVANCEMENT = " + (timeEvol.length * nbCoups) / AVG_NB_COUPS);
 			System.out.println("TIME REMAINING = " + remaining);
 			System.out.println("TIME LIMIT = " + timeLimit);
 			System.out.println("COEF PRISES = " + coefPrises);
@@ -134,23 +137,34 @@ public class JoueurTropFort implements IJoueur {
 		return coup;
 	}
 	
-	private int estimationAvancement() {
-		// TODO
-		return 0;
-	}
-	
 	private int calcTimeLimit() {
-		// TODO : estimation
-		int av = (timeEvol.length * nbCoups) / AVG_NB_COUPS;
-		if(av >= timeEvol.length) {
-			av = (3 * timeEvol.length) / 4;
+		int nbCoupsRestants = ESTIM_MAJ_NB_COUPS - nbCoups;
+		int av = (timeEvol.length * nbCoups) / (nbCoups + nbCoupsRestants);
+		
+		// bidouille dans le cas très peu probable où on dépasserait ESTIM_MAJ_NB_COUPS
+		while(av >= timeEvol.length) {
+			av -= 1;
+			nbCoupsRestants += 1;
 		}
-		return (timeEvol[av] * remaining) / timeCurveSums[av];
+		
+		int sumTR = 0;
+		float step = (float) (timeEvol.length - av) / (float) nbCoupsRestants;
+		for(int i = 0; i < nbCoupsRestants; i++) {
+			int offset = (int) Math.floor(step * (float)i);
+			sumTR += timeEvol[av+offset];
+		}
+		int timeLimit = (timeEvol[av] * remaining) / sumTR;
+		
+		// idem : cas où dépassement de ESTIM_MAJ_NB_COUPS
+		// (ce qui pourrait potentiellement mener à un timeLimit négatif → crash)
+		if(timeLimit < MIN_TIMELIMIT) 
+			timeLimit = MIN_TIMELIMIT;
+		
+		return timeLimit;
 	}
 	
 	private float calcExpAvancee() {
-		// TODO : estimation
-		int av = (expAvanceeEvol.length * nbCoups) / AVG_NB_COUPS;
+		int av = (expAvanceeEvol.length * nbCoups) / ESTIM_MAJ_NB_COUPS;
 		if(av >= expAvanceeEvol.length) {
 			av = (3 * expAvanceeEvol.length) / 4;
 		}
@@ -158,8 +172,7 @@ public class JoueurTropFort implements IJoueur {
 	}
 	
 	private float calcCoefPrises() {
-		// TODO : estimation
-		int av = (coefPrisesEvol.length * nbCoups) / AVG_NB_COUPS;
+		int av = (coefPrisesEvol.length * nbCoups) / ESTIM_MAJ_NB_COUPS;
 		if(av >= coefPrisesEvol.length) {
 			av = (3 * coefPrisesEvol.length) / 4;
 		}
@@ -167,8 +180,7 @@ public class JoueurTropFort implements IJoueur {
 	}
 	
 	private float calcCoefBloqueurs() {
-		// TODO : estimation
-		int av = (coefBloqueursEvol.length * nbCoups) / AVG_NB_COUPS;
+		int av = (coefBloqueursEvol.length * nbCoups) / ESTIM_MAJ_NB_COUPS;
 		if(av >= coefBloqueursEvol.length) {
 			av = (3 * coefBloqueursEvol.length) / 4;
 		}

@@ -156,6 +156,19 @@ public class PlateauFrontieres implements Partie1 {
 		}
 	}
 	
+	public boolean coupValide2(Joueur who, CoupFrontieres c) {
+		if(c.isNoMove()) {
+			return who.equals(current) && coupsPossibles().get(0).isNoMove();
+		}
+		else {
+			int i = c.geti();
+			int j = c.getj();
+			if(0 <= i && i < NB_LIGNES && 0 <= j && j < NB_COLONNES)
+				return (plateau[i][j] == VIDE || plateau[i][j] == (who.equals(joueur1) ? PION_J2 : PION_J1));
+			return false;
+		}
+	}
+	
 	public void joue(CoupFrontieres c) {
 		if(!c.isNoMove()) {
 			int new_i = c.geti();
@@ -574,10 +587,8 @@ public class PlateauFrontieres implements Partie1 {
 	}
 
 	public boolean caseJouable(int i, int j) {
-		if(current.equals(joueur1))
-			return plateau[i][j] == PION_J1;
-		else
-			return plateau[i][j] == PION_J2;
+			return plateau[i][j] == PION_J1 ||
+				   plateau[i][j] == PION_J2;
 	}
 
 	public static void main(String args[]){

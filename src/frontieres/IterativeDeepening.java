@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 
 public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 
@@ -82,6 +81,7 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 
 		while(elapsed < timeLimit) {
 			retour = search(board);
+			//System.out.println("\tBest move : " + retour.b);
 			if(retour.a == HeuristiqueFrontieres.MAX_HEUR || retour.a == HeuristiqueFrontieres.MIN_HEUR || retour.a == HeuristiqueFrontieres.TIE_HEUR)
 				return retour.b; // issue de la partie fixée : on arrête l'itération, coup renvoyé directement
 			++ profMax;
@@ -145,17 +145,11 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 				newAlpha = -negAlphaBeta(newBoard, -beta, -alpha, 1, false);
 				Couple<Float, CoupFrontieres> coupHeur = new Couple<Float, CoupFrontieres>(newAlpha, coup);
 
-				if(coupeRacine){
-					tree.add(new Couple<Float, CoupFrontieres>(HeuristiqueFrontieres.MIN_HEUR, coup));
-					newCoupsHeur.put(coup, HeuristiqueFrontieres.MIN_HEUR);
-				}
-				else if(!discard) { // coup exploré entièrement : màj de son heuristique
+				if(!discard) { // coup exploré entièrement : màj de son heuristique
 					tree.add(coupHeur);
-					newCoupsHeur.put(coup, newAlpha);
 				}
 				else{
-					//On ajoute le coup avec son heuristique de la profondeur précédente.
-					tree.add(new Couple<Float, CoupFrontieres>(coupsHeur.get(coup), coup));
+					tree.add(new Couple<Float, CoupFrontieres>(HeuristiqueFrontieres.MIN_HEUR, coup));
 				}
 
 				if(newAlpha > alpha) {
@@ -173,21 +167,18 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 			}
 			else if(!gagn && timeout){
 				//On ajoute le coup avec son heuristique de la profondeur précédente.
-				tree.add(new Couple<Float, CoupFrontieres>(coupsHeur.get(coup), coup));
+				tree.add(new Couple<Float, CoupFrontieres>(HeuristiqueFrontieres.MIN_HEUR, coup));
 			}
 			else{
 				break;
 			}
 		}
 		
-		if(!discard){
-			//Dans ce cas, on remet a jour l'ancien mapping des heuristiques avec le nouveau
-			coupsHeur = newCoupsHeur;
-		}
-		
+		/*
 		for(Couple<Float, CoupFrontieres> cpl : tree){
 			System.out.println("Coup : " + cpl.b + " H : " + cpl.a);
 		}
+		*/
 		
 		return tree.min();
 	}
@@ -279,3 +270,4 @@ public class IterativeDeepening extends TimerTask implements AlgoFrontieres {
 		return heuristique;
 	}
 }
+
