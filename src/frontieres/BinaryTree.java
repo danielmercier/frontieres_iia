@@ -3,15 +3,15 @@ package frontieres;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 
+/*Structure type arbre binaire de recherche avec doublons*/
 public class BinaryTree<E extends Comparable<E>> implements Collection<E> {
 	
-	private class Tree<E>{
-		public E val;
-		public Tree<E> g;
-		public Tree<E> d;
-		public Tree(E val){
+	private class Tree<T>{
+		public T val;
+		public Tree<T> g;
+		public Tree<T> d;
+		public Tree(T val){
 			this.val = val;
 		}
 	}

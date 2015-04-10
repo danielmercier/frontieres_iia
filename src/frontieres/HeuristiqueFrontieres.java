@@ -2,24 +2,14 @@ package frontieres;
 
 import java.util.LinkedList;
 
-import frontieres.Applet.Board;
-
 public class HeuristiqueFrontieres {
-
-	public static final int MODE1 = 0;
-	public static final int MODE2 = 1;
-	public static final int MODE3 = 2;
-
 	public static final float MIN_HEUR = -Float.MAX_VALUE;
 	public static final float MAX_HEUR = Float.MAX_VALUE;
 	public static final float TIE_HEUR = 0.001f;
 
-	private int mode;
 	private Joueur joueur;
 	private float expAvancee;
 	private float coefPrises;
-	private float coefBloqueurs;
-	private float coefLib;
 
 	public void setExpAvancee(float ea) {
 		expAvancee = ea;
@@ -33,44 +23,9 @@ public class HeuristiqueFrontieres {
 		coefPrises = cb;
 	}
 
-	public HeuristiqueFrontieres(int mode, Joueur joueur) {
-		this.mode = mode;
+	public HeuristiqueFrontieres(Joueur joueur) {
 		this.joueur = joueur;
 	}
-
-	//Liberté d'une piece, le nombre de case qu'elle peut parcourir sans ce faire manger, sachant que l'adv essayera de la manger.
-	/*public void liberte(PlateauFrontieres board){
-		ArrayList<Position> piecesMoi = board.getPieces(joueur);
-		ArrayList<Position> piecesAutre = board.getPieces(board.getOther(joueur));
-
-		int liberteMoi = 0;
-		int liberteAutre = Integer.MAX_VALUE;
-
-		int nbPossibleFrontiereMoi = 0;
-
-		for(Position posMoi : piecesMoi){
-			int liberteInter = Integer.MAX_VALUE;
-			for(Position posAutre : piecesAutre){
-				int newLiberteMoi = ((board.isJoueurBlanc(joueur)) ? 1 : -1) * (posMoi.row - posAutre.row) - Math.abs(posMoi.col - posAutre.col) - 1;
-
-				if(newLiberteMoi < 0){
-					if((board.isJoueurBlanc(joueur))
-							newLiberteMoi = posMoi.row;
-				}
-				else if(newLiberteMoi == 0)
-
-				if(newLiberteMoi < liberteInter){
-					liberteInter = newLiberteMoi;
-				}
-			}
-
-			if((liberteInter + posMoi.row) >= 8){
-				nbPossibleFrontiereMoi++;
-			}
-
-			liberteMoi += liberteInter;
-		}
-	}*/
 
 	public int liberte(Joueur who, PlateauFrontieres board){
 		int coefselonj = (board.isJoueurBlanc(who)) ? 1 : -1;
@@ -101,6 +56,7 @@ public class HeuristiqueFrontieres {
 	}
 
 	//simulation pour trouver la liberte d'une piece
+	//Fonction non utilisé pour l'heuristique, trop longue
 	public int liberte(PlateauFrontieres board, Position pos, int alpha, int beta, int prof){
 		//3 coups possible max
 		int nbBouge = 0;
@@ -174,6 +130,7 @@ public class HeuristiqueFrontieres {
 		}
 	}
 
+	//fonction utilisée par liberte pour simuler les mouvements ennemi.
 	public int ennemy(PlateauFrontieres board, Position pos, int alpha, int beta, int prof){
 
 		LinkedList<CoupFrontieres> ajouer = new LinkedList<CoupFrontieres>();

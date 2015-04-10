@@ -2,6 +2,7 @@
 
 package frontieres;
 
+//Joueur qui jou avec alphabeta classique
 public class JoueurAlphaBeta implements IJoueur {
 	private PlateauFrontieres plateau;
 	private String me;
@@ -31,7 +32,7 @@ public class JoueurAlphaBeta implements IJoueur {
 		}
 		
 		//Spécifier l'algo ici
-		algo = new AlphaBeta(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
+		algo = new AlphaBeta(new HeuristiqueFrontieres(mej));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package frontieres;
 
+//Joueur qui jou avec alphabeta classique
 public class JoueurAlpha implements IJoueur {
 
 	private int myCol;
@@ -14,7 +15,7 @@ public class JoueurAlpha implements IJoueur {
 		Joueur moi = (mycolour == BLANC) ? j1 : j2;
 		board = new PlateauFrontieres(j1, j2, j1);
 		
-		algo = new AlphaBeta(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, moi));
+		algo = new AlphaBeta(new HeuristiqueFrontieres(moi));
 	}
 
 	@Override
@@ -24,7 +25,7 @@ public class JoueurAlpha implements IJoueur {
 
 	@Override
 	public String choixMouvement() {
-		CoupFrontieres coup = algo.meilleurCoup(6, board);
+		CoupFrontieres coup = algo.meilleurCoup(7, board);
 		board.joue(coup);
 		
 		return coup.toString();

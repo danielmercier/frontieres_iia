@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+//Joueur qui joue avec iterative deepening alphabeta et gestion du temps au cours de la partie
 public class JoueurTropFort implements IJoueur {
 
 	private static final int TOTAL_TIME = 120000; // temps total accordé
@@ -24,9 +25,9 @@ public class JoueurTropFort implements IJoueur {
 	// bornes inf et sup des paramètres variables (hors temps de recherche)
 	// utilisés pour dé-normaliser les courbes bitmap
 	private static final float MIN_EXP_AVANCEE = 1.1f;
-	private static final float MAX_EXP_AVANCEE = 2f;
-	private static final float MIN_COEF_PRISES = 200f;
-	private static final float MAX_COEF_PRISES = 300f;
+	private static final float MAX_EXP_AVANCEE = 1.6f;
+	private static final float MIN_COEF_PRISES = 1000f;
+	private static final float MAX_COEF_PRISES = 2000f;
 	private static final float MIN_COEF_BLOQUEURS = 0f;
 	private static final float MAX_COEF_BLOQUEURS = 20f;
 	
@@ -75,17 +76,19 @@ public class JoueurTropFort implements IJoueur {
 			mej = j1;
 			me = "blanc";
 			ennemi = "noir";
-			remaining = 2 * 60 * 1000;
+			remaining = 10 * 60 * 1000;
+			//amplitudeCoefPrises = ;
 		}
 		else{
 			mej = j2;
 			me = "noir";
 			ennemi = "blanc";
-			remaining = 2 * 60 * 1000;
+			remaining = 10 * 60 * 1000;
+			//amplitudeCoefPrises = ;
 		}
 
 		//Spécifier l'algo ici
-		algo = new IterativeDeepening(new HeuristiqueFrontieres(HeuristiqueFrontieres.MODE2, mej));
+		algo = new IterativeDeepening(new HeuristiqueFrontieres(mej));
 	}
 
 	@Override

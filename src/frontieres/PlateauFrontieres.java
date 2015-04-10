@@ -8,9 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 
 
@@ -175,16 +172,21 @@ public class PlateauFrontieres implements Partie1 {
 			int new_j = c.getj();
 			if(current.equals(joueur1)) {
 				j1noMove = false;
-				if(isEnemy(new_i, new_j))
+				if(isEnemy(new_i, new_j)){
 					++ nbPrisesJ1;
+					pieceJ2.remove(new Position(new_i, new_j));
+				}
+				
 				plateau[new_i][new_j] = PION_J1;
 				pieceJ1.add(new Position(new_i, new_j));
 				pieceJ1.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
 			}
 			else {
 				j2noMove = false;
-				if(isEnemy(new_i, new_j))
+				if(isEnemy(new_i, new_j)){
 					++ nbPrisesJ2;
+					pieceJ1.remove(new Position(new_i, new_j));
+				}
 				plateau[new_i][new_j] = PION_J2;
 				pieceJ2.add(new Position(new_i, new_j));
 				pieceJ2.remove(new Position(c.getFrom().geti(), c.getFrom().getj()));
@@ -311,31 +313,13 @@ public class PlateauFrontieres implements Partie1 {
 	}
 
 	public float getAvanceeX(Joueur who, float exp) {
-		int i = 0, j = 0, k = 0, nbPions;
-		char symb;
 		float avancee = 0, increment;
-		if(who.equals(joueur1)) {
-			nbPions = NB_PIONS_INIT_J1 - nbPrisesJ2;
-			symb = PION_J1;
+
+		for(Position p : this.getPieces(who)){
+		    increment = (who.equals(joueur1) ? NB_LIGNES-1-p.row : p.row);
+		    avancee += Math.pow(increment, exp);
 		}
-		else {
-			nbPions = NB_PIONS_INIT_J2 - nbPrisesJ1;
-			symb = PION_J2;
-		}
-		boolean done = false;
-		while(!done && i < NB_LIGNES) {
-			j = 0;
-			while(!done && j < NB_COLONNES) {
-				if(plateau[i][j] == symb) {
-					++ k;
-					increment = (who.equals(joueur1) ? NB_LIGNES-1-i : i);
-					avancee += Math.pow(increment, exp);
-				}
-				++ j;
-				done = (k == nbPions);
-			}
-			++ i;
-		}
+
 		return avancee;
 	}
 
@@ -589,19 +573,5 @@ public class PlateauFrontieres implements Partie1 {
 	public boolean caseJouable(int i, int j) {
 			return plateau[i][j] == PION_J1 ||
 				   plateau[i][j] == PION_J2;
-	}
-
-	public static void main(String args[]){
-		/*Joueur j1 = new Joueur("blanc");
-		Joueur j2 = new Joueur("noir");
-	
-		PlateauFrontieres p = new PlateauFrontieres(j1,j2,j1);
-		System.out.println(p);
-		p.play("A8-B7", "blanc");
-		System.out.println(p);
-		p.play("D1-E2", "noir");
-		System.out.println(p);
-		p.saveToFile("sauvegarde");*/
-		
 	}
 }
